@@ -1,7 +1,6 @@
-// pages/api/picks.js
-import fs from 'fs';
+import { Redis } from '@upstash/redis';
 
-const DATA_FILE = '/tmp/picks-pga.json';
+const redis = Redis.fromEnv();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'pga2025';
 
 const DRAFT_SEQUENCE = [
@@ -17,48 +16,47 @@ const DRAFT_SEQUENCE = [
   'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian','Jack'
 ];
 
-function loadData() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-    }
-  } catch (e) {}
-  return { picks: {}, pickLog: [] };
+async function loadData() {
+  const picks = await redis.get('picks') || {};
+  const pickLog = await redis.get('pickLog') || [];
+  return { picks, pickLog };
 }
 
-function saveData(data) {
-  try { fs.writeFileSync(DATA_FILE, JSON.stringify(data)); } catch (e) {}
+async function saveData(picks, pickLog) {
+  await redis.set('picks', picks);
+  await redis.set('pickLog', pickLog);
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method === 'GET') {
-    return res.status(200).json(loadData());
+    const data = await loadData();
+    return res.status(200).json(data);
   }
 
   if (req.method === 'POST') {
     const { action, participant, golfer, password } = req.body;
-    const data = loadData();
+    const { picks, pickLog } = await loadData();
 
     if (action === 'reset') {
       if (password !== ADMIN_PASSWORD) return res.status(403).json({ error: 'Wrong password' });
-      saveData({ picks: {}, pickLog: [] });
+      await saveData({}, []);
       return res.status(200).json({ success: true });
     }
 
     if (action === 'undo') {
       if (password !== ADMIN_PASSWORD) return res.status(403).json({ error: 'Wrong password' });
-      if (data.pickLog.length === 0) return res.status(400).json({ error: 'Nothing to undo' });
-      const last = data.pickLog.pop();
-      data.picks[last.player] = (data.picks[last.player] || []).filter(g => g !== last.golfer);
-      if (data.picks[last.player].length === 0) delete data.picks[last.player];
-      saveData(data);
-      return res.status(200).json({ success: true, picks: data.picks, pickLog: data.pickLog });
+      if (pickLog.length === 0) return res.status(400).json({ error: 'Nothing to undo' });
+      const last = pickLog.pop();
+      picks[last.player] = (picks[last.player] || []).filter(g => g !== last.golfer);
+      if (picks[last.player].length === 0) delete picks[last.player];
+      await saveData(picks, pickLog);
+      return res.status(200).json({ success: true, picks, pickLog });
     }
 
     if (action === 'pick') {
       if (!participant || !golfer) return res.status(400).json({ error: 'Missing fields' });
 
-      const currentPickNum = data.pickLog.length;
+      const currentPickNum = pickLog.length;
       if (currentPickNum >= DRAFT_SEQUENCE.length) {
         return res.status(400).json({ error: 'Draft is complete' });
       }
@@ -68,21 +66,21 @@ export default function handler(req, res) {
         return res.status(403).json({ error: `It's ${expectedPlayer}'s turn, not ${participant}'s` });
       }
 
-      for (const [p, golfers] of Object.entries(data.picks)) {
+      for (const [p, golfers] of Object.entries(picks)) {
         if (golfers.includes(golfer)) {
           return res.status(409).json({ error: `${golfer} already picked by ${p}` });
         }
       }
 
-      if (!data.picks[participant]) data.picks[participant] = [];
-      data.picks[participant].push(golfer);
-      data.pickLog.push({ pickNum: currentPickNum + 1, player: participant, golfer });
-      saveData(data);
+      if (!picks[participant]) picks[participant] = [];
+      picks[participant].push(golfer);
+      pickLog.push({ pickNum: currentPickNum + 1, player: participant, golfer });
+      await saveData(picks, pickLog);
 
       return res.status(200).json({
         success: true,
-        picks: data.picks,
-        pickLog: data.pickLog,
+        picks,
+        pickLog,
         pickNum: currentPickNum + 1,
       });
     }
