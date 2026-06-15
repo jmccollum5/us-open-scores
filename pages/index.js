@@ -2,30 +2,30 @@ import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 
 const DRAFT_SEQUENCE = [
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian',
-  'Jack','Jack',
-  'Adrian','Mark','Tomas','Zach','Corey','Georgie','Kollas','Mike',
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian',
-  'Jack','Jack',
-  'Adrian','Mark','Tomas','Zach','Corey','Georgie','Kollas','Mike',
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian',
-  'Jack','Jack',
-  'Adrian','Mark','Tomas','Zach','Corey','Georgie','Kollas','Mike',
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian','Jack'
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas',
+  'Kollas','Kollas',
+  'Tomas','Mike','Zach','Adrian','Corey','Mark','Georgie','Jack',
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas',
+  'Kollas','Kollas',
+  'Tomas','Mike','Zach','Adrian','Corey','Mark','Georgie','Jack',
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas',
+  'Kollas','Kollas',
+  'Tomas','Mike','Zach','Adrian','Corey','Mark','Georgie','Jack',
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas','Kollas'
 ];
 
-const PARTICIPANTS = ['Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian','Jack'];
+const PARTICIPANTS = ['Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas','Kollas'];
 
 const PARTICIPANT_COLORS = {
-  'Mike':   '#ef4444',
-  'Kollas': '#f97316',
-  'Georgie':'#eab308',
-  'Corey':  '#22c55e',
-  'Zach':   '#06b6d4',
-  'Tomas':  '#3b82f6',
-  'Mark':   '#8b5cf6',
-  'Adrian': '#ec4899',
   'Jack':   '#14b8a6',
+  'Georgie':'#eab308',
+  'Mark':   '#8b5cf6',
+  'Corey':  '#22c55e',
+  'Adrian': '#ec4899',
+  'Zach':   '#06b6d4',
+  'Mike':   '#ef4444',
+  'Tomas':  '#3b82f6',
+  'Kollas': '#f97316',
 };
 
 const FIELD = [
@@ -261,7 +261,7 @@ export default function Home() {
   };
 
   const handleAdminLogin = () => {
-    if (adminPassword === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'usopen2025')) {
+    if (adminPassword === (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'usopen2026')) {
       setAdminAuthed(true); setAdminError('');
     } else setAdminError('Wrong password');
   };
