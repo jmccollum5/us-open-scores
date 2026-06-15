@@ -1,30 +1,30 @@
 import { Redis } from '@upstash/redis';
 
 const redis = Redis.fromEnv();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'pga2025';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'usopen2026';
 
 const DRAFT_SEQUENCE = [
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian',
-  'Jack','Jack',
-  'Adrian','Mark','Tomas','Zach','Corey','Georgie','Kollas','Mike',
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian',
-  'Jack','Jack',
-  'Adrian','Mark','Tomas','Zach','Corey','Georgie','Kollas','Mike',
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian',
-  'Jack','Jack',
-  'Adrian','Mark','Tomas','Zach','Corey','Georgie','Kollas','Mike',
-  'Mike','Kollas','Georgie','Corey','Zach','Tomas','Mark','Adrian','Jack'
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas',
+  'Kollas','Kollas',
+  'Tomas','Mike','Zach','Adrian','Corey','Mark','Georgie','Jack',
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas',
+  'Kollas','Kollas',
+  'Tomas','Mike','Zach','Adrian','Corey','Mark','Georgie','Jack',
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas',
+  'Kollas','Kollas',
+  'Tomas','Mike','Zach','Adrian','Corey','Mark','Georgie','Jack',
+  'Jack','Georgie','Mark','Corey','Adrian','Zach','Mike','Tomas','Kollas'
 ];
 
 async function loadData() {
-  const picks = await redis.get('picks') || {};
-  const pickLog = await redis.get('pickLog') || [];
+  const picks = await redis.get('usopen-picks') || {};
+  const pickLog = await redis.get('usopen-pickLog') || [];
   return { picks, pickLog };
 }
 
 async function saveData(picks, pickLog) {
-  await redis.set('picks', picks);
-  await redis.set('pickLog', pickLog);
+  await redis.set('usopen-picks', picks);
+  await redis.set('usopen-pickLog', pickLog);
 }
 
 export default async function handler(req, res) {
