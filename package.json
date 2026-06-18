@@ -1,5 +1,5 @@
 {
-  "name": "pga-picks",
+  "name": "us-open-scores",
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,6 @@
   "dependencies": {
     "next": "15.3.6",
     "react": "^18",
-    "react-dom": "^18",
-    "@upstash/redis": "^1.34.0"
+    "react-dom": "^18"
   }
 }
